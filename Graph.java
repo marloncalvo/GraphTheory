@@ -147,7 +147,46 @@ public class Graph
 	
 	// We want to have DFS iteratively
 	
-	// Do the same for all, with Lists
+	// Check if graph is bipartite
+	
+	// Find graph is k-colorable
+	
+	// Count number of connected componenets
+	
+	// Dijkstras implementation
+	
+	// Bellman-ford
+	
+	// Kruskals algo
+	
+	// Prims algo
+	
+	// Find Hamiltonian Path / Cycle
+	
+	// Find Eulerian Path / Cycle ?
+
+	// Do the same for all, with Lists! Good luck
+	
+	// MORE NOTES:
+	// Try to follow along more of the stuff on Webcourses. Here are some things to try.
+	// For every algorithm implementation. Try to get a single solution, solution; and a multi-solution, solution.
+	// Modify my implementation of Dijkstra's algorithm to print its output in alphabetic order by vertex.
+	// Modify my implementation of Dijkstra's algorithm to print not just the shortest path lengths, but also the actual paths taken.
+	//
+	// Code up an O(|V|2) version of Dijkstra's algorithm that does not use a minheap. This might be trickier than you'd think; you have to 
+	// use an array where removing the smallest element happens in O(1) time (after finding that smallest element in O(n) time). 
+	// So, you can't just use an ArrayList and call the remove() method to pull out the smallest element from an arbitrary position, 
+	// since removing the first element of an ArrayList is an O(n) operation
+	//
+	// Use Bellman-Ford to track negative cycles.
+	// Maybe? Code up single-room scheduling problem, multiple-room scheduling problem, continuous knapsack problem.
+	//
+	// Backtracking side:
+	// Fox-Goose-Problem solve. (Already solved it)
+	// Missionaries and Cannibals Problem.
+	// Iterative solution to NQueens problem. (Try to also get it print only one solution, many solutions, and only two solutions without class member variables) - Maybe with recursion and without ;)
+	// Follow along 7/8 in #Backtracking
+	//
 	
 	// Constructor that loads a map from file
 	
