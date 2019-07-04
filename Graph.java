@@ -1,5 +1,10 @@
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import java.util.Queue;
+
+import java.util.Arrays;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,8 +145,166 @@ public class Graph
 			
 	
 	// We want to have BFS for graph recursively
+        public void bfs(int node)
+        {
+            boolean [] used = new boolean[n];
+
+            int [] path = new int[n];
+
+            used[node] = true;
+            path[0] = node;
+
+            bfs(used, path, node, 1);
+        }
+
+        // In here, we want to mimick the queue operation by having a Set of Nodes to visit recursive call.
+        // Since we are already doing recursion, might as well print all possible combinations as well :)
+        //
+        // To print all possible BFS's, we have to permutate each "Children" ArrayList so that we get different orderings.
+        // How do we permute elements?
+        //
+        // 
+        
+        private void bfs(boolean [] used, int [] path, int node, int index)
+        {
+            // If we tracked all elements
+            //
+            if (index == n)
+            {
+                printPath(path);
+                return;
+            }
+
+            // For each children of current state, we want to create a List of permuted elements for each.
+            // So for example, we are at Node 0 (root). Root has 3 children. Then we can simply create all permutations of 
+            // those children. But once we BFS'd down to where we are finding the children of all those BF's,
+            // we need to find the permutations for each Node's children seperately and join them according to the
+            // original order of it's parent.
+            
+            // This arraylist holds all the possible permutations for each Node's children
+
+            // We first want to find all the children of current Node
+            ArrayList<Integer> list = new ArrayList<>();
+
+            // For all vertices, we want to find which are adjacent to current Node
+            for (int i = 0; i < n; i++)
+            {
+                // We only want to add Nodes that have not been used
+                // The i'th term indicates a Node that we are adjacent to
+                if (matrix[node][i] && !used[i])
+                {
+                    list.add(i);
+                }
+            }
+            
+            // Create arraylist that will hold all the permutations of current Node's children
+            ArrayList<ArrayList<Integer>> perms = new ArrayList<>();
+
+            // Permute the list, which is stored in perms
+            permuteList(perms, list, list.size());
+
+            // We are iterating through each permutation
+            for (ArrayList<Integer> l : perms)
+            {
+                // Through each specfic node we can visit in that permutation
+                for (Integer nextNode : l)
+                {
+                    // We are visiting that node
+                    used[nextNode] = true;
+                    path[index] = nextNode;
+                    bfs(used, path, nextNode, index + 1);
+
+                    used[nextNode] = false;
+                }
+            }
+        }
 	
 	// We want to have BFS iteratively
+        public void bfsIteratively(int start)
+        {
+            boolean [] visited = new boolean[n];
+
+            Queue<Integer> q = new LinkedList<>();
+
+            // we want to add to the queue, and for every pop, we want to get all the adjacent nodes to it
+
+            visited[start] = true;
+            q.add(start);
+
+            // we want to first visit all the Nodes for current Node
+            // we do that by popping from queue
+            while (!q.isEmpty())
+            {
+                int node = q.remove();
+                printNode(node);
+
+                // we want to add all of the Current Node's children to visit first
+                for (int i = 0; i < n; i++)
+                {
+                    // if we havent visited this node yet
+                    if (matrix[node][i] && !visited[i])
+                    {
+                        visited[i] = true;
+                        q.add(i);
+                    }
+                }
+            }
+        }
+
+        // Add all permutations of a Set of numbers to a List, includes original List
+        private void permuteList(ArrayList<ArrayList<Integer>> permuted, 
+                                 ArrayList<Integer> list, int size)
+        {
+            // Heap's base case
+            if (size == 1)
+            {
+                permuted.add(new ArrayList<Integer>(list));
+                return;
+            }
+
+            // Along each step of the way, we are permuting from left-to-right
+            for (int i = 0; i < size; i++)
+            {
+                // we permute this state, and the state where we permute the element next to this one
+                // so we permute [ab]c
+                // and a[bc]
+                //
+                // I think... probably wrong tho
+                permuteList(permuted, list, size - 1);
+                
+                // if even, we switch first and "last" element, indicated by size. Realize last is
+                // not the last element of the list.
+                if (size%2==0)
+                {
+                    int temp = list.get(i);
+                    list.set(i, list.get(size-1));
+                    list.set(size-1, temp);
+                }
+
+                // if odd, we switch first and "last" element
+                else
+                {
+                    int temp = list.get(0);
+                    list.set(0, list.get(size-1));
+                    list.set(size-1, temp);
+                }
+            }
+        }
+        
+        /*
+        private void swap(Integer a, Integer b)
+        {
+            int temp = a;
+            a = b;
+            b = temp;
+        }
+        */
+    
+        public void printNode(int node)
+        {
+            System.out.print(value[node]);
+        }
+
 	
 	// We want to have DFS for graph recursively
 	
@@ -248,5 +411,7 @@ public class Graph
 		Graph g = new Graph(args[0]);
 		g.topologicalSort();
 		g.topologicalSortWList();
-	}
+                g.bfsIteratively(0);
+                g.bfs(0);
+        }
 }
