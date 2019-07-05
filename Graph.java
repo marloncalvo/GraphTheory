@@ -535,9 +535,7 @@ public class Graph
             System.out.print(value[node]);
         }
 
-	// Topo sort iteratively
-	
-	// We want to have DFS iteratively
+	// We want to have DFS iteratively with all traversals ** HARD **
 	
 	// Check if graph is bipartite
 	
