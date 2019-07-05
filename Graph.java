@@ -1,10 +1,10 @@
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import java.util.Queue;
-
+import java.util.Stack;
 import java.util.Arrays;
+
+import java.util.Scanner;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +38,51 @@ public class Graph
 		topologicalSort(used, dependencies, path, 0);
 	}
 
+    public void topologicalSortIteratively(int startNode)
+    {
+        int [] dependencies = new int[n];
+        int [] path = new int[n];
+
+        Stack<Integer> s = new Stack<>();
+
+        for (ArrayList<Integer> adj : list)
+        {
+            for (Integer adjNode : adj)
+            {
+                dependencies[adjNode]++;
+            }
+        }
+        System.out.println("Topo Sort Iteratively...");
+
+        s.push(startNode);
+
+        int i = 0;
+        while (!s.isEmpty())
+        {
+            int node = s.pop();
+            path[i++] = node;
+            // want to deincrement priority for all nodes adjecnt to it
+            for (Integer adjNode : list.get(node))
+            {
+                dependencies[adjNode]--;
+                if (dependencies[adjNode] == 0)
+                {
+                    s.push(adjNode);
+                }
+            }
+        }
+
+        System.out.println("\tFound \"path\"...");
+        System.out.print("\t");
+        printPath(path);
+        System.out.println();
+    }
+
 	private void topologicalSort(boolean [] used, int [] dependencies, int [] path, int index)
 	{
 		if (index == n)
 		{
-            System.out.println("\tFound path...");
+            System.out.println("\tFound \"path\"...");
             System.out.print("\t");
 			printPath(path);
             System.out.println();
@@ -436,6 +476,50 @@ public class Graph
 
             return false;
         }
+
+        // This method will print out all possible dfs traversals
+        // 
+        public void dfsAll(int startNode)
+        {
+            boolean [] visited = new boolean[n];
+            int [] path = new int[n];
+            Arrays.fill(path, -1);
+
+            Stack<Integer> s = new Stack<Integer>();
+
+            visited[startNode] = true;
+            s.push(startNode);
+
+
+            System.out.println("All DFS Traversal Iteratively...");
+
+            // To traverse, we must keep adding to the stack
+            boolean flag = false;
+            while (!s.isEmpty())
+            {
+                flag = false;
+                int node = s.peek();
+                printNode(node);
+                System.out.println();
+                for(ArrayList<Integer> permutation : permuteList(list.get(node)))
+                {
+                    for (Integer aNode : permutation)
+                    {
+                        if (!visited[aNode])
+                        {
+                            visited[aNode] = true;
+                            s.push(aNode);
+                            flag = true;
+                        }
+                    }
+                }
+
+                if (!flag)
+                {
+                    s.pop();
+                }
+            }
+        }
         
         /*
         private void swap(Integer a, Integer b)
@@ -452,8 +536,6 @@ public class Graph
         }
 
 	// Topo sort iteratively
-
-	// We want to have DFS for graph recursively
 	
 	// We want to have DFS iteratively
 	
@@ -588,8 +670,10 @@ public class Graph
 		Graph g = new Graph(args[0]);
 		g.topologicalSort();
 		g.topologicalSortWList();
+        g.topologicalSortIteratively(0);
         g.bfsIteratively(0);
         g.bfs(0);
         g.dfs(0);
+        g.dfsAll(0);
     }
 }
