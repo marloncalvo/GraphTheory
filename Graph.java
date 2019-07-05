@@ -17,6 +17,7 @@ public class Graph
 	// Every time we encounter a node that has 0 dependencies, we will lower the dependency value of each Node it is adjacent to
 	public void topologicalSort()
 	{
+        System.out.println("All Topo Sort Traversals...");
 		boolean [] used = new boolean[n];
 
 		int [] path = new int[n];
@@ -37,12 +38,15 @@ public class Graph
 		topologicalSort(used, dependencies, path, 0);
 	}
 
-	private boolean topologicalSort(boolean [] used, int [] dependencies, int [] path, int index)
+	private void topologicalSort(boolean [] used, int [] dependencies, int [] path, int index)
 	{
 		if (index == n)
 		{
+            System.out.println("\tFound path...");
+            System.out.print("\t");
 			printPath(path);
-			return true;
+            System.out.println();
+			return;
 		}
 
 		// For every vertex in the graph, let's check its dependecy values
@@ -59,31 +63,26 @@ public class Graph
 						dependencies[j]--;
 					}
 				}
-			}
 
-			// Set this Node as used, update path to print, and run backtrack state change
-			used[i] = true;
+    			// Set this Node as used, update path to print, and run backtrack state change
+    			used[i] = true;
 
-			path[index] = i;
+    			path[index] = i;
 
-			if (topologicalSort(used, dependencies, path, index + 1))
-			{
-				return true;
-			}
+    			topologicalSort(used, dependencies, path, index + 1);
 
-			// Revert changes
-			used[i] = false;
+    			// Revert changes
+    			used[i] = false;
 
-			for (int j = 0; j < n; j++)
-			{
-				if (matrix[i][j] == true)
-				{
-						dependencies[j]++;
-				}
-			}
+    			for (int j = 0; j < n; j++)
+    			{
+    				if (matrix[i][j] == true)
+    				{
+    						dependencies[j]++;
+    				}
+    			}
+            }
 		}
-
-		return false;
 	}
 
 	// This works in a very similar way to the other topo sort implementation. Except now we are using a List.
@@ -101,6 +100,7 @@ public class Graph
 				dependencies[node]++;
 			}
 		}
+        System.out.println("Topo Sort Traversal...");
 
 		topologicalSortWList(used, dependencies, path, 0);
 	}
@@ -110,7 +110,10 @@ public class Graph
 	{
 		if (index == n)
 		{
-			printPath(path);
+			System.out.println("\tFound path...");
+            System.out.print("\t");
+            printPath(path);
+            System.out.println();
 			return true;
 		}
 
@@ -142,82 +145,6 @@ public class Graph
 
 		return false;
 	}
-			
-	
-	// We want to have BFS for graph recursively
-        public void bfs(int node)
-        {
-            boolean [] used = new boolean[n];
-
-            int [] path = new int[n];
-
-            used[node] = true;
-            path[0] = node;
-
-            bfs(used, path, node, 1);
-        }
-
-        // In here, we want to mimick the queue operation by having a Set of Nodes to visit recursive call.
-        // Since we are already doing recursion, might as well print all possible combinations as well :)
-        //
-        // To print all possible BFS's, we have to permutate each "Children" ArrayList so that we get different orderings.
-        // How do we permute elements?
-        //
-        // 
-        
-        private void bfs(boolean [] used, int [] path, int node, int index)
-        {
-            // If we tracked all elements
-            //
-            if (index == n)
-            {
-                printPath(path);
-                return;
-            }
-
-            // For each children of current state, we want to create a List of permuted elements for each.
-            // So for example, we are at Node 0 (root). Root has 3 children. Then we can simply create all permutations of 
-            // those children. But once we BFS'd down to where we are finding the children of all those BF's,
-            // we need to find the permutations for each Node's children seperately and join them according to the
-            // original order of it's parent.
-            
-            // This arraylist holds all the possible permutations for each Node's children
-
-            // We first want to find all the children of current Node
-            ArrayList<Integer> list = new ArrayList<>();
-
-            // For all vertices, we want to find which are adjacent to current Node
-            for (int i = 0; i < n; i++)
-            {
-                // We only want to add Nodes that have not been used
-                // The i'th term indicates a Node that we are adjacent to
-                if (matrix[node][i] && !used[i])
-                {
-                    list.add(i);
-                }
-            }
-            
-            // Create arraylist that will hold all the permutations of current Node's children
-            ArrayList<ArrayList<Integer>> perms = new ArrayList<>();
-
-            // Permute the list, which is stored in perms
-            permuteList(perms, list, list.size());
-
-            // We are iterating through each permutation
-            for (ArrayList<Integer> l : perms)
-            {
-                // Through each specfic node we can visit in that permutation
-                for (Integer nextNode : l)
-                {
-                    // We are visiting that node
-                    used[nextNode] = true;
-                    path[index] = nextNode;
-                    bfs(used, path, nextNode, index + 1);
-
-                    used[nextNode] = false;
-                }
-            }
-        }
 	
 	// We want to have BFS iteratively
         public void bfsIteratively(int start)
@@ -226,17 +153,22 @@ public class Graph
 
             Queue<Integer> q = new LinkedList<>();
 
+            int [] path = new int[n];
+
             // we want to add to the queue, and for every pop, we want to get all the adjacent nodes to it
+
+            System.out.println("BFS Iterative Traversal...");
 
             visited[start] = true;
             q.add(start);
 
             // we want to first visit all the Nodes for current Node
             // we do that by popping from queue
+            int k = 0;
             while (!q.isEmpty())
             {
                 int node = q.remove();
-                printNode(node);
+                path[k++] = node;
 
                 // we want to add all of the Current Node's children to visit first
                 for (int i = 0; i < n; i++)
@@ -249,8 +181,179 @@ public class Graph
                     }
                 }
             }
+
+            System.out.println("\tFound path...");
+            System.out.print("\t");
+            printPath(path);
+            System.out.println();
         }
 
+        // We want to have BFS for graph recursively
+        public void bfs(int node)
+        {
+            boolean [] used = new boolean[n];
+            
+            int [] path = new int[n];
+            Arrays.fill(path, -1);
+
+            used[node] = true;
+            path[0] = node;
+
+            ArrayList<Integer> nodes = new ArrayList<>();
+            nodes.add(0);
+
+            System.out.println("All BFS Traversals...");
+            bfs(used, path, nodes, 1);
+        }
+
+        // In here, we want to mimick the queue operation by having a Set of Nodes to visit recursive call.
+        // Since we are already doing recursion, might as well print all possible combinations as well :)
+        //
+        // To print all possible BFS's, we have to permutate each "Children" ArrayList so that we get different orderings.
+        // How do we permute elements?
+        //
+        // 
+        
+        // This method prints all BFS's possible with recursion.
+        // We must make sure that we are printing all the permutations possible for each Node's children.
+        // What we are doing is from the given list of Nodes, we will add those to the path first.
+        // Then, we want to visit a Node, create a permutation of it, and then visit all other Nodes and visit all possible permutations of each.
+        // Visit those paths. And do the same for each permutation of that 1st node.
+        private void bfs(boolean [] used, int [] path, ArrayList<Integer> nodes, int index)
+        {
+            // If we tracked all elements
+            if (index >= n)
+            {
+                System.out.println("\tFound path...");
+                System.out.print("\t");
+                printPath(path);
+                System.out.println("");
+                return;
+            }
+
+            // Store all the children for each Node seperately
+            ArrayList<ArrayList<Integer>> children = new ArrayList<>();
+
+
+            //System.out.println("INFO FOR CURRENT STATE OF BFS\t");
+            //printPathAsSet(nodes);
+            //System.out.println();
+            //System.out.println("\tCHILDREN FOR NODE");
+
+            // For all vertices, we want to find which are adjacent to current Node
+            for (Integer node : nodes)
+            {
+                //System.out.print("\t");
+                //printNode(node);
+                ArrayList<Integer> children_t = new ArrayList<>();
+                for (int i = 0; i < n; i++)
+                {
+                    // We only want to add Nodes that have not been used
+                    // The i'th term indicates a Node that we are adjacent to
+                    if (matrix[node][i] && !used[i])
+                    {
+                        children_t.add(i);
+                    }
+                }
+
+                //System.out.print("\t");
+                //printPathAsSet(children_t);
+                children.add(children_t);
+            }
+
+            //System.out.println();
+
+            // We are iterating through each permutation
+            for (ArrayList<Integer> perms : permuteNodes(children))
+            {
+                /*
+                System.out.println("\tPermutation...");
+                System.out.print("\t");
+                printPathAsSet(perms);
+                System.out.println();
+                */
+
+                // Through each specfic node we can visit in that permutation
+                int i = 0;
+
+                //System.out.println(index);
+                for (Integer nextNode : perms)
+                {
+                    // We are visiting that node
+                    used[nextNode] = true;
+                    path[index+i] = nextNode;
+                    i++;
+                }
+/*
+                System.out.println("PRINTING CURRENT PATH");
+                System.out.print("\t");
+                printPath(path);
+                System.out.println();
+*/
+                bfs(used, path, perms, index + i);
+
+                for (Integer nextNode : perms)
+                {
+                    used[nextNode] = false;
+                }
+            }
+        }
+
+        // We want to store all the possible permutation for each Node
+        private ArrayList<ArrayList<Integer>> permuteNodes(ArrayList<ArrayList<Integer>> nodes)
+        {
+            ArrayList<ArrayList<ArrayList<Integer>>> permutationsForChildren = new ArrayList<>();
+
+            ArrayList<Integer> currentPermutation = new ArrayList<>();
+            ArrayList<ArrayList<Integer>> finalPermutations = new ArrayList<>();
+
+            // Build List with the permutation of their children, for each Node
+            for (ArrayList<Integer> children : nodes)
+            {
+                permutationsForChildren.add(permuteList(children));
+            }
+
+            permuteNodes(permutationsForChildren, currentPermutation, finalPermutations, 0);
+
+            return finalPermutations;
+        }
+
+        // We want to permute all these list so...
+        // a[0] + a1[0] + a2[0] + a3[0]
+        // a[0] + a1[0] + a2[0] + a3[1]
+        // and so on...
+        // The pm structure is structured like so
+        // Parent Child -> i'th Permutation Reference -> i'th Permutation
+        // We will be returning all possible permuted lists, as shown above.
+        private void permuteNodes(ArrayList<ArrayList<ArrayList<Integer>>> permutationsForChildren, 
+                                                ArrayList<Integer> currentPermutation, 
+                                                ArrayList<ArrayList<Integer>> finalPermutations, 
+                                                int node)
+        {
+            // Stop if we permuted for each Parent node
+            if (node == permutationsForChildren.size())
+            {
+                finalPermutations.add(new ArrayList<>(currentPermutation));
+                return;
+            }
+
+            // Get all permutations for current Node
+            for (ArrayList<Integer> permutation : permutationsForChildren.get(node))
+            {
+                ArrayList<Integer> currPermCopy = new ArrayList<>(currentPermutation);
+                currPermCopy.addAll(permutation);
+
+                permuteNodes(permutationsForChildren, currPermCopy, finalPermutations, node + 1);
+            }
+        }
+
+        private ArrayList<ArrayList<Integer>> permuteList(ArrayList<Integer> list)
+        {
+        	ArrayList<ArrayList<Integer>> permuted = new ArrayList<>();
+        	permuteList(permuted, list, list.size());
+
+            return permuted;
+        }
         // Add all permutations of a Set of numbers to a List, includes original List
         private void permuteList(ArrayList<ArrayList<Integer>> permuted, 
                                  ArrayList<Integer> list, int size)
@@ -290,6 +393,49 @@ public class Graph
                 }
             }
         }
+
+        public void dfs(int node)
+        {
+            boolean [] visited = new boolean[n];
+
+            ArrayList<Integer> path = new ArrayList<>(n);
+
+            visited[node] = true;
+            path.add(0);
+
+            System.out.println("DFS Traversal...");
+            dfs(visited, path, node);
+        }
+
+        private boolean dfs(boolean [] visited, ArrayList<Integer> path, int node)
+        {
+            if (path.size() == n)
+            {
+                System.out.println("\tFound path...");
+                System.out.print("\t");
+                printPath(path);
+                System.out.println();
+                return true;
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                if (matrix[node][i] && !visited[i])
+                {
+                    visited[i] = true;
+                    path.add(i);
+
+                    if (dfs(visited, path, i))
+                    {
+                        return true;
+                    }
+
+                    visited[i] = false;
+                }
+            }
+
+            return false;
+        }
         
         /*
         private void swap(Integer a, Integer b)
@@ -305,7 +451,8 @@ public class Graph
             System.out.print(value[node]);
         }
 
-	
+	// Topo sort iteratively
+
 	// We want to have DFS for graph recursively
 	
 	// We want to have DFS iteratively
@@ -357,14 +504,44 @@ public class Graph
 	{
 		for (int i = 0; i < path.length - 1; i++)
 		{
-			System.out.print(value[i] + " -> ");
+            if (path[i] == -1) return;
+			System.out.print(value[path[i]] + " -> ");
 		}
 		
 		if (path.length > 1)
 		{
-			System.out.println(value[path.length-1]);
+			System.out.println(value[path[path.length-1]]);
 		}
 	}
+
+    private void printPath(ArrayList<Integer> path)
+    {
+        for (int i = 0; i < path.size() - 1; i++)
+        {
+            System.out.print(value[path.get(i)] + " -> ");
+        }
+        
+        if (path.size() > 1)
+        {
+            System.out.println(value[path.get(path.size()-1)]);
+        }
+    }
+
+    private void printPathAsSet(ArrayList<Integer> path)
+    {
+        System.out.print("[");
+        for (int i = 0; i < path.size() - 1; i++)
+        {
+            System.out.print(value[path.get(i)] + ", ");
+        }
+        
+        if (path.size() >= 1)
+        {
+            System.out.print(value[path.get(path.size()-1)]);
+        }
+
+        System.out.println("]");
+    }
 
 	int n;
 	boolean [][] matrix;
@@ -411,7 +588,8 @@ public class Graph
 		Graph g = new Graph(args[0]);
 		g.topologicalSort();
 		g.topologicalSortWList();
-                g.bfsIteratively(0);
-                g.bfs(0);
-        }
+        g.bfsIteratively(0);
+        g.bfs(0);
+        g.dfs(0);
+    }
 }
