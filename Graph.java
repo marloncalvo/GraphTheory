@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.Arrays;
@@ -538,6 +539,78 @@ public class Graph
 	// We want to have DFS iteratively with all traversals ** HARD **
 	
 	// Check if graph is bipartite
+        // Can simply adding to a different array (have two arrays, insert at opposite arrays at each iteration),
+        // work? In the case of an empty graph, it is necessarily true? The only time that a graph is NOT bipartite
+        // is when there are no ways to construct two Sets of Nodes where they are not adjacent to each other.
+        //
+        // It seems that BFS must work. For every iteration of BFS, we are visiting Nodes that are part of the
+        // Set opposing our current Node. If for every iteration, we do BFS traversal and add the visited Nodes
+        // to the corresponding Set, and none of those Nodes are adjacent each other, we reach our solution.
+        //
+        // Important to note:
+        // It may be helpful to know that we may only return false if we notice that two Nodes are adjacent in a BFS traversal.
+        
+        public boolean isBipartite(int startNode)
+        {
+            boolean [] used = new boolean[n];
+            // we need to keep track of what Nodes are at either side of the graph
+            boolean [][] partition = new boolean[n][n];
+
+            Queue<Integer> q = new ArrayDeque<>();
+
+            used[startNode] = true;
+            partition[0][startNode] = true;
+            q.add(startNode);
+
+            int part = 0;
+            int itr = 0;
+            while (itr < n)
+            {
+                int qSize = q.size();
+                int [] nodes = new int[qSize];
+
+                for (int i = 0; i < qSize; i++)
+                {
+                    itr++;
+                    nodes[i] = q.remove();
+                    partition[part][nodes[i]] = true;
+                }
+
+                // Check if any other Node in the partition is adjacent to this
+                for (int j = 0; j < qSize; j++)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        // Find any element that have been inserted
+                        if (partition[part][i] && i != nodes[j])
+                        {
+                            // Check if there is adjacency
+                            if (matrix[nodes[j]][i] || matrix[i][nodes[j]])
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                for (int j = 0; j < qSize; j++)
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (matrix[nodes[j]][i] && !used[i])
+                        {
+                            q.add(i);
+                            used[i] = true;
+                        }
+                    }
+                }
+
+                part = (part + 1) % 2;
+            }
+
+            return true;
+        }
+
 	
 	// Find graph is k-colorable
 	
@@ -665,13 +738,14 @@ public class Graph
 
 	public static void main(String [] args) throws IOException
 	{
-		Graph g = new Graph(args[0]);
-		g.topologicalSort();
-		g.topologicalSortWList();
-        g.topologicalSortIteratively(0);
-        g.bfsIteratively(0);
-        g.bfs(0);
-        g.dfs(0);
-        g.dfsAll(0);
+	    Graph g = new Graph(args[0]);
+	    g.topologicalSort();
+	    g.topologicalSortWList();
+            g.topologicalSortIteratively(0);
+            g.bfsIteratively(0);
+            //g.bfs(0);
+            g.dfs(0);
+            g.dfsAll(0);
+            System.out.println("isBipartite() " + g.isBipartite(0));
     }
 }
